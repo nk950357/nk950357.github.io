@@ -13,6 +13,7 @@
         src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=yFffIYhmflQRZq2UJl5mstyiwHm-O0MznBcsTvLT3gFrUym3LOgnB5gc0OaTSuDRGtk-mCehwvMLBMC7xGqIDuqkNA1Abr7B69iIaHHB5Q3Y2ZQWmD_k3ROh5xOHUJN_-9-z3jg2xVylfHjDEy6KK51uAHECXHL9oMowWSBZyMKH7Byzuk3BXIl0kkzO2-qkJG-2YtqsVbVA6OTiLTchzi0-hVyokLPZt7tgD4J39RFnPqDFZgWIDuJZvyblrJvA8JuHQZUqLkuAVV-FalMl7pM2yc24bx0kCeaREXVgXf2Xa-y8NRjfXD-OLPX8daxgLRR_PlsCToQRf2im0lOSSzP7WYzAb86aUdviVPnuIRkoJwp0vrT3hz6I1ypWLQ_c8qTCD5-hKDgoopfxiT8LQKwQah8DQ85M4wU3oF0MyjycqwBhIlw5MjshkL1gxhL01UG9PhdZ2AI4r8uorN6QeA"
         charset="UTF-8"></script>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!--Bootstrap 4的文字圖案被拔掉，因此載入第三方css FontAwesome來使用-->
     <script type="text/javascript"
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFToBVc8-IVffxFucXyz9XA9TzmYDGo5I"></script>
     <script type="text/javascript"
@@ -40,7 +41,7 @@
         }
 
         .footer {
-            position: absolute;
+            position: relative;
             bottom: 0;
             width: 100%;
             height: 40px;
@@ -49,7 +50,7 @@
         #bg {
             background: linear-gradient(180deg, #ddee4F, #CCD7E4, #CCD7E4, #FFFFFF, #FFFFFF) 0% 0% / 150% 150%;
             animation: 10s ease-in-out infinite Gradient;
-
+            /*做漸層動畫的功能*/
         }
 
         .fa {
@@ -62,6 +63,7 @@
             font-weight: normal;
             line-height: 1;
             -moz-osx-font-smoothing: grayscale;
+            /*設定第三方的文字圖案樣式*/
         }
 
         @keyframes Gradient {
@@ -89,10 +91,17 @@
 
         $.get('https://spreadsheets.google.com/feeds/list/1wftPLLy8UxLe991RRK1Z21UyaReB7nPUwN6wmOEIdo8/1/public/values?alt=json',
             function (data) {
+                //從google sheet讀取資料
                 d = data.feed.entry;
+
+                //測試資料是否讀取成功
                 console.log(d);
+
+                //依序處理每筆資料
                 for (var i in d) {
                     var watr_price, elec_price;
+
+                    //判定是否含水電
                     if (d[i].gsx$電費價格為_2.$t == "" && d[i].gsx$水費價格為_2.$t == "") {
                         watr_price = "含水";
                         elec_price = "含電";
@@ -107,6 +116,7 @@
                         elec_price = d[i].gsx$電費價格為_2.$t;
                     }
 
+                    //設定各租屋處的"點我看更多"按鈕，並給所有div一個ID，方便修改
                     var button_set = "<th> <button type = " + '"button"' + "id=" + i + " class=" +
                         '"btn btn-warning"' +
                         " data-toggle=" + '"modal"' +
@@ -122,7 +132,8 @@
                         "<div id=" + '"' + "map" + i + '"' + " style=" + '"width:auto;height:300px"' + "></div>" +
                         "</th>";
 
-
+                    //將載入資料轉為網頁內容
+                    //我們發現用中文也可以當id，因此我們直接把區域名稱當作ID使用
                     document.getElementById(d[i].gsx$區域.$t).innerHTML += "<tr>" +
                         "<th>" + d[i].gsx$詳細道路地址.$t + "</th>" +
                         "<th>" + d[i].gsx$平均一個月租金.$t + "</th>" +
@@ -140,15 +151,15 @@
 
         $(document.body).css({
             "overflow-x": "hidden",
-
+            //因為橫向的寬度稍微過長，會有一個橫向的拉動bar，這個是把它隱藏起來的
         });
 
         $(function () {
             $('[data-toggle="popover"]').popover()
         })
 
+        //初始化地圖
         function initialize() {
-
             geocoder = new google.maps.Geocoder();
             var latlng = new google.maps.LatLng(23.696010, 120.534129);
             var mapOptions = {
@@ -156,17 +167,12 @@
                 center: latlng
             }
             map = new google.maps.Map(document.getElementById('map' + event.target.id), mapOptions);
-            InputAddressFromText();
-        }
-
-
-        function InputAddressFromText() {
-            address = "雲林縣斗六市" + d[event.target.id].gsx$詳細道路地址.$t;
             codeAddress();
         }
 
-
+        //設定地圖位置到event.target.id上，設定失敗會提示
         function codeAddress() {
+            address = "雲林縣斗六市" + d[event.target.id].gsx$詳細道路地址.$t;
             geocoder.geocode({
                 'address': address
             }, function (results, status) {
@@ -183,6 +189,7 @@
 
         }
 
+        //以下功能是切換各主題的功能
         function change_color1() {
             document.getElementById("bg").style =
                 "background: linear-gradient(180deg, #D5C9DF, #CCD7E4, #CCD7E4, #FFFFFF,  #FFFFFF) 0% 0% / 150% 150%;" +
@@ -252,7 +259,6 @@
             });
 
         })(document);
-        //2020/1/3------------------------改動(結束)
     </script>
 
     <div>
@@ -439,6 +445,7 @@
 
 
         <div class="tab-content">
+            <!--這裡都是表格內的內容-->
             <div class="tab-pane active" id="zhongshan">
                 <table id="中山路" class="table table-hover">
                     <thead>
@@ -667,7 +674,7 @@
                 </table>
             </div>
         </div>
-            
+
 
 
 
@@ -689,6 +696,7 @@
 </body>
 
 <style>
+    /*這裡是Tab plane的樣式修改*/
     #tabs {
         background: #007b5e;
         color: #eee;
